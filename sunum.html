@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChartToText - Tanıtım Sunumu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .slide-enter { animation: fadeIn 0.25s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased m-0 p-4 sm:p-8 select-none min-h-screen flex flex-col justify-between">
+
+  <!-- ÜST BAR: Başlık & Slayt Sayacı -->
+  <header class="flex items-center justify-between gap-4 pb-4 border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/25 text-xs">
+        C2T
+      </div>
+      <div>
+        <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">ChartToText</h1>
+        <p class="text-xs text-slate-400">Grafik Verisi Çıkarım Uygulaması • Tanıtım</p>
+      </div>
+    </div>
+
+    <!-- Slayt İndikatörü ve Not Butonu -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-medium">
+        <span id="current-slide-num" class="text-blue-400 font-bold">1</span>
+        <span class="text-slate-500">/ 6</span>
+      </div>
+      <button id="toggle-notes-btn" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5" title="Açıklama Notlarını Göster/Gizle">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="hidden sm:inline">Açıklama</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SLAYT ALANI -->
+  <main class="my-auto py-8 flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full">
+
+    <!-- SLAYT 1 -->
+    <div class="slide slide-enter space-y-6" data-slide="1">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium">
+        📌 Genel Tanım
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+        ChartToText Nedir?
+      </h2>
+      <p class="text-base sm:text-lg text-slate-300 leading-relaxed">
+        <strong>ChartToText</strong>; PDF raporlarında, makalelerde veya web sitelerinde yer alan görsel formatındaki grafikleri (çubuk, çizgi, pasta vb.) yapay zeka modelleriyle okuyup doğrudan <strong>Excel (.xlsx)</strong>, <strong>CSV</strong> ve <strong>JSON</strong> tablo formatına dönüştüren yerel bir masaüstü/web uygulamasıdır.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="text-sm font-bold text-blue-400 mb-1">Görselden Tabloya</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Grafik ekran görüntülerini satır ve sütun içeren yapılandırılmış tabloya çevirir.</div>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="text-sm font-bold text-emerald-400 mb-1">Çoklu Model Desteği</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Google DePlot ve Alibaba Qwen2-VL modellerini ihtiyaca göre seçebilme imkanı.</div>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="text-sm font-bold text-purple-400 mb-1">Tamamen Yerel</div>
+          <div class="text-xs text-slate-400 leading-relaxed">İnternet bağlantısına veya dış API'lere bağımlı olmadan kendi bilgisayarınızda çalışır.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLAYT 2 -->
+    <div class="slide hidden space-y-6" data-slide="2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+        🎯 Geliştirilme Amacı
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Neden Bu Uygulamaya İhtiyaç Duyuldu?
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-rose-400 font-bold text-sm">Standart OCR'ın Yetersizliği</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Klasik OCR araçları (Tesseract vb.) sadece düz metin okuyabilir. Grafiklerdeki çubukların uzunluğunu, eksen ölçeklerini veya dilim açılarını anlayamaz; metin ve sayıları sırasız ve bağlantısız şekilde çıkarır.
+          </p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-amber-400 font-bold text-sm">Ham Veriye Erişememe Problemi</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Statista, haber siteleri veya kurumsal sunumlarda paylaşılan grafiklerin genellikle ham Excel dosyası verilmez; sadece PNG/JPG resmi bulunur. Sayıları tek tek elle yazmak zaman alıcıdır ve yazım hatalarına açıktır.
+          </p>
+        </div>
+      </div>
+      <div class="p-4 rounded-xl bg-blue-950/20 border border-blue-500/30 text-xs text-blue-300">
+        ChartToText, grafik okumak için özel eğitilmiş görme (vision) modellerini sade bir kullanıcı arayüzüyle birleştirerek bu ihtiyacı çözer.
+      </div>
+    </div>
+
+    <!-- SLAYT 3 -->
+    <div class="slide hidden space-y-6" data-slide="3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+        ⚙️ Çalışma Mantığı
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Nasıl Çalışır? (4 Adımlı İş Akışı)
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm mb-3">1</div>
+          <div class="font-bold text-sm text-white mb-1">Görsel Yükleme</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Grafik görseli sürükle-bırak yöntemiyle veya dosya seçilerek yüklenir.</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm mb-3">2</div>
+          <div class="font-bold text-sm text-white mb-1">Model Seçimi</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Grafiğin yapısına göre DePlot veya Qwen2-VL modellerinden biri seçilir.</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm mb-3">3</div>
+          <div class="font-bold text-sm text-white mb-1">Ayrıştırma (Parsing)</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Model çıktısı temizlenir, başlık, sütun ve satırlar tablo matrisine dönüştürülür.</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 shadow">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm mb-3">4</div>
+          <div class="font-bold text-sm text-white mb-1">Dışa Aktarma</div>
+          <div class="text-xs text-slate-400 leading-relaxed">Oluşan tablo ekranda incelenebilir, Excel (.xlsx) veya CSV olarak indirilir.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLAYT 4 -->
+    <div class="slide hidden space-y-6" data-slide="4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium">
+        🧠 Modeller & Altyapı
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Kullanılan Yapay Zeka Modelleri
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-sm text-blue-400">Google DePlot (285M)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium">LoRA v2</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Grafikleri doğrudan metin tablosuna çevirmek için özel eğitilmiş kompakt bir modeldir. Standart grafiklerde (çubuk, pasta vb.) hızlı sonuç üretir. Statista veri seti üzerinde LoRA ile ince ayar yapılmıştır.
+          </p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-sm text-emerald-400">Qwen2-VL-2B (2.2B)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium">4-bit + LoRA</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Yeni nesil çok modlu (görsel-dil) modeldir. Çok fazla metin içeren, karmaşık başlıklı veya yoğun veri noktalarına sahip grafiklerde daha yüksek bağlamsal kavrayış sağlar.
+          </p>
+        </div>
+      </div>
+      <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300">
+        💡 <strong>LoRA & Ham Model Seçimi:</strong> Arayüz üzerinden hem eğitilmiş LoRA modelleri hem de orijinal ham temel modeller seçilerek karşılaştırma yapılabilir.
+      </div>
+    </div>
+
+    <!-- SLAYT 5 -->
+    <div class="slide hidden space-y-6" data-slide="5">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium">
+        💻 Teknik Özellikler
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Teknik Özellikler ve Donanım Uyumluluğu
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-xs font-bold text-cyan-400">Düşük VRAM Tüketimi</div>
+          <div class="text-sm font-bold text-white">~1.5 GB VRAM</div>
+          <p class="text-xs text-slate-400 leading-relaxed">Qwen2-VL modeli 4-bit (bitsandbytes) olarak yüklendiği için 4 GB VRAM'e sahip dizüstü GPU'larda (RTX 3050 vb.) rahatça çalışır.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-xs font-bold text-emerald-400">Türkçe Excel Desteği</div>
+          <div class="text-sm font-bold text-white">.xlsx ve Noktalı Virgül (;)</div>
+          <p class="text-xs text-slate-400 leading-relaxed">Türkçe Excel'in sütunları tek hücreye toplamasını önlemek için noktalı virgüllü CSV ve yerel openpyxl Excel formatı sunar.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-xs font-bold text-blue-400">Veri Gizliliği</div>
+          <div class="text-sm font-bold text-white">%100 Çevrimdışı / Yerel</div>
+          <p class="text-xs text-slate-400 leading-relaxed">Yüklenen grafikler ve üretilen tablolar yerel bilgisayarınızda kalır; üçüncü parti bulutlara veri aktarılmaz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLAYT 6 -->
+    <div class="slide hidden space-y-6" data-slide="6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium">
+        🚀 Başlatma & Mimari
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Kurulum ve Çalıştırma
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-3 shadow">
+          <div class="text-sm font-bold text-white">Tek Komutla Başlatma</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Uygulama klasöründeki <strong>baslat.bat</strong> dosyası çalıştırıldığında gerekli servisler başlar ve varsayılan tarayıcınızda <strong>http://127.0.0.1:8000</strong> adresi otomatik olarak açılır.
+          </p>
+          <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-xs text-blue-300">
+            .\baslat.bat
+          </div>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 shadow">
+          <div class="text-sm font-bold text-white">Teknoloji Yığını</div>
+          <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed">
+            <li>• <strong>Backend:</strong> Python, FastAPI, PyTorch, Transformers, PEFT</li>
+            <li>• <strong>Frontend:</strong> React 19, Tailwind CSS, Vite</li>
+            <li>• <strong>Sunucu:</strong> Uvicorn (Yerel Asenkron HTTP)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300">
+        📌 <strong>Özet:</strong> ChartToText, akademik araştırma ve pratik kullanım için tasarlanmış, kurulumu ve kullanımı zahmetsiz açık mimarili bir grafik-tablo çeviricisidir.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- AÇIKLAMA BÖLÜMÜ (Açılıp Kapanabilir) -->
+  <div id="notes-container" class="hidden my-4 p-4 rounded-xl bg-slate-800 border border-blue-500/30 text-xs text-slate-300 leading-relaxed shadow-lg">
+    <div class="flex items-center gap-1.5 text-blue-400 font-bold mb-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>Bu Slaytın Amacı:</span>
+    </div>
+    <p id="notes-text"></p>
+  </div>
+
+  <!-- ALT KONTROL PANELİ -->
+  <footer class="flex items-center justify-between gap-4 pt-4 border-t border-slate-800">
+    <!-- İlerleme Çubuğu -->
+    <div class="flex-1 max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden">
+      <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 16.66%;"></div>
+    </div>
+
+    <!-- Navigasyon Butonları -->
+    <div class="flex items-center gap-2">
+      <button id="prev-btn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-1">
+        <span>←</span> Önceki
+      </button>
+      <button id="next-btn" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-1">
+        Sonraki <span>→</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const slideDescriptions = {
+      1: "ChartToText uygulamasının temel tanımını yapar: Grafik görsellerini yapay zeka ile doğrudan Excel, CSV ve JSON tablolarına çeviren yerel bir masaüstü/web aracıdır.",
+      2: "Uygulamanın çıkış noktasını açıklar: Standart OCR motorlarının grafik eksenlerini okuyamaması ve raporlardaki grafiklerin ham verilerine ulaşılamaması problemine odaklanır.",
+      3: "Uygulamanın basit 4 adımlı iş akışını özetler: Görsel seçimi -> Model tercihi -> Yapay zeka ile metin/tablo ayrıştırma -> Excel olarak indirme.",
+      4: "Kullanılan modelleri teknik olarak tanıtır: Google DePlot (grafik odaklı kompakt model) ve Qwen2-VL-2B (gelişmiş çok modlu model) ile LoRA adaptörlerinin rolünü belirtir.",
+      5: "Sistemin donanım gereksinimlerini ve dosya formatlarını açıklar: 4-bit nicelleştirme ile 1.5 GB VRAM tüketimi, tamamen yerel çalışma ve Türkçe Excel uyumu.",
+      6: "Uygulamanın nasıl başlatıldığını (baslat.bat), mimarisini (FastAPI + React) ve genel özetini aktarır."
+    };
+
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const currentSlideNum = document.getElementById('current-slide-num');
+    const progressBar = document.getElementById('progress-bar');
+    const notesContainer = document.getElementById('notes-container');
+    const notesText = document.getElementById('notes-text');
+    const toggleNotesBtn = document.getElementById('toggle-notes-btn');
+
+    let notesVisible = false;
+
+    function updateSlide(newSlide) {
+      if (newSlide < 1 || newSlide > totalSlides) return;
+      
+      slides.forEach(s => {
+        s.classList.add('hidden');
+        s.classList.remove('slide-enter');
+      });
+
+      const active = document.querySelector(`.slide[data-slide="${newSlide}"]`);
+      if (active) {
+        active.classList.remove('hidden');
+        active.classList.add('slide-enter');
+      }
+
+      currentSlide = newSlide;
+      currentSlideNum.textContent = currentSlide;
+      progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+
+      notesText.textContent = slideDescriptions[currentSlide] || "";
+    }
+
+    prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+    nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+    toggleNotesBtn.addEventListener('click', () => {
+      notesVisible = !notesVisible;
+      notesContainer.classList.toggle('hidden', !notesVisible);
+      toggleNotesBtn.classList.toggle('bg-blue-600', notesVisible);
+      toggleNotesBtn.classList.toggle('text-white', notesVisible);
+    });
+
+    // Klavye Ok Tuşları ile Geçiş
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        updateSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft') {
+        updateSlide(currentSlide - 1);
+      }
+    });
+
+    // Başlangıç durumu
+    updateSlide(1);
+  </script>
+</body>
+</html>

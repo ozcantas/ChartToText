@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Grafik Görsellerinden Tablo Çıkarımı: DePlot ve Qwen2-VL Modellerinde LoRA ile Fine-Tuning Deneyimi</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 18mm 20mm 18mm;
+      @bottom-right {
+        content: counter(page);
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      font-size: 10.5pt;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-top: 0;
+      margin-bottom: 8pt;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 11pt;
+      font-weight: 500;
+      color: #475569;
+      line-height: 1.45;
+      margin-bottom: 16pt;
+      padding-bottom: 12pt;
+      border-bottom: 1.5pt solid #e2e8f0;
+    }
+    h2 {
+      font-size: 12.5pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-top: 16pt;
+      margin-bottom: 6pt;
+      padding-bottom: 3pt;
+      border-bottom: 1pt solid #cbd5e1;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 10pt;
+      margin-bottom: 4pt;
+      page-break-after: avoid;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 8pt;
+      text-align: justify;
+    }
+    ul {
+      margin-top: 4pt;
+      margin-bottom: 8pt;
+      padding-left: 18pt;
+    }
+    li {
+      margin-bottom: 3pt;
+    }
+    strong {
+      color: #0f172a;
+    }
+    .callout {
+      background: #f8fafc;
+      border-left: 3.5pt solid #3b82f6;
+      padding: 8pt 12pt;
+      margin: 8pt 0 12pt 0;
+      border-radius: 0 4pt 4pt 0;
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+    .callout-title {
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 3pt;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10pt 0 14pt 0;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-weight: 700;
+      text-align: left;
+      padding: 6pt 8pt;
+      border: 1pt solid #cbd5e1;
+    }
+    td {
+      padding: 5pt 8pt;
+      border: 1pt solid #e2e8f0;
+    }
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1.5pt 5pt;
+      font-size: 8.5pt;
+      font-weight: 600;
+      border-radius: 3pt;
+      background: #e0f2fe;
+      color: #0369a1;
+      margin-right: 4pt;
+    }
+    .footer-note {
+      margin-top: 20pt;
+      padding-top: 8pt;
+      border-top: 1pt solid #e2e8f0;
+      font-size: 8.5pt;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Grafik Görsellerinden Tablo Çıkarımı: DePlot ve Qwen2-VL Modellerinde LoRA ile Fine-Tuning Deneyimi</h1>
+  <div class="subtitle">
+    Önceden eğitilmiş görme modellerini grafik okuma görevine uyarlamak: Fine-tuning nedir, PEFT/LoRA nasıl çalışır ve Statista veri seti üzerinde modellerimizi nasıl eğittik?
+  </div>
+
+  <h2>1. Projenin Amacı Nedir?</h2>
+  <p>
+    Bu projenin tek ve net bir hedefi vardır: <strong>Görsel formatındaki grafikleri (çubuk, çizgi, pasta vb.) analiz ederek doğrudan satır ve sütunlardan oluşan yapılandırılmış tablo formatına (Markdown, CSV, Excel) dönüştürmek.</strong>
+  </p>
+  <p>
+    Grafikler görsel olarak insan gözü için tasarlanmıştır; ancak bu verilerin analiz edilmesi, veri tabanlarına kaydedilmesi veya hesaplamalara dahil edilebilmesi için ham sayısal tabloya dönüştürülmesi gerekir. Bu çalışmada, grafik görsellerini girdi olarak alıp altta yatan veri tablosunu çıktı olarak üreten uçtan uca bir yapay zeka sistemi kurduk.
+  </p>
+
+  <h2>2. Fine-Tuning (İnce Ayar) Nedir?</h2>
+  <p>
+    Büyük yapay zeka modelleri (Foundation Models) internetteki milyarlarca genel metin ve görsel verisiyle eğitilir. Bu modeller genel dünyayı, dilleri ve nesneleri tanır; ancak belirli bir niş görevde (örneğin bir grafikteki eksen koordinatını okuyup tablo matrisi üretmek) doğrudan en yüksek başarıyı gösteremezler.
+  </p>
+  <p>
+    <strong>Fine-Tuning (İnce Ayar)</strong>; genel amaçlı önceden eğitilmiş (pre-trained) bir temel modelin ağırlıklarını, belirli bir alana ait özel bir veri kümesi (bizim durumumuzda grafik-tablo çiftleri) ile yeniden eğiterek o görevde uzmanlaştırma işlemidir.
+  </p>
+
+  <h2>3. Neden LoRA (Parameter-Efficient Fine-Tuning) Kullandık?</h2>
+  <p>
+    Geleneksel ince ayarda (Full Fine-Tuning), modelin sahip olduğu yüz milyonlarca veya milyarlarca parametrenin tamamı güncellenir. Bu yöntem:
+  </p>
+  <ul>
+    <li>Çok yüksek GPU belleği (VRAM) ve donanım gücü gerektirir.</li>
+    <li>Modelin bildiği genel yetenekleri unutmasına (<em>catastrophic forgetting</em>) yol açabilir.</li>
+    <li>Her ince ayar için modelin tamamını (gigabaytlarca) diskte saklamayı gerektirir.</li>
+  </ul>
+  <p>
+    Bu kısıtları aşmak için <strong>PEFT (Parameter-Efficient Fine-Tuning)</strong> yöntemlerinden biri olan <strong>LoRA (Low-Rank Adaptation)</strong> mimarisini kullandık.
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">LoRA Nasıl Çalışır?</div>
+    LoRA, orijinal modelin milyarlarca parametrelik devasa matrislerini dondurur (freeze eder) ve bunların yanına çok küçük, düşük dereceli (low-rank) iki küçük matris ekler (A ve B matrisleri). Eğitim sırasında sadece bu minik adaptör matrisleri öğrenir.
+    <ul style="margin-top: 4pt; margin-bottom: 0;">
+      <li><strong>Google DePlot:</strong> 285 Milyon toplam parametrenin yalnızca <strong>3.5 Milyonu (%1.24)</strong> eğitildi.</li>
+      <li><strong>Qwen2-VL-2B:</strong> 2.2 Milyar toplam parametrenin yalnızca <strong>4.3 Milyonu (%0.20)</strong> eğitildi.</li>
+    </ul>
+  </div>
+  <p>
+    Bu sayede tüm modeli baştan eğitmek yerine sadece <strong>7 MB ile 17 MB</strong> boyutunda küçük adaptör dosyaları üreterek aynı başarıyı sağladık.
+  </p>
+
+  <h2>4. Projede Ne Yaptık? (Eğitim Adımları ve Parametreler)</h2>
+  <p>
+    Projemizde grafik okuma alanında iki farklı mimariyi ele aldık:
+  </p>
+  <ul>
+    <li><strong>Google DePlot (282M):</strong> Pix2Struct tabanlı, doğrudan görseli tablo metnine çevirmeye odaklı kompakt encoder-decoder modeli.</li>
+    <li><strong>Alibaba Qwen2-VL-2B (2.2B):</strong> Yeni nesil çok modlu (Vision-Language) model.</li>
+  </ul>
+
+  <h3>Eğitim Veri Seti</h3>
+  <p>
+    Modellerimizi, akademik alanda standart kabul edilen <strong>Statista Chart-to-Text</strong> veri kümesi (farklı tiplerdeki binlerce grafik ve bunlara karşılık gelen zemin doğruluk / ground-truth tabloları) üzerinde eğittik.
+  </p>
+
+  <h3>LoRA Hiperparametreleri</h3>
+  <ul>
+    <li><strong>LoRA Rank (r):</strong> <code>16</code> (Düşük dereceli matrisin boyutu; temsil gücü ile hız dengesi)</li>
+    <li><strong>LoRA Alpha (&alpha;):</strong> <code>32</code> (Öğrenilen ağırlıkların ana modele etki ölçeği)</li>
+    <li><strong>LoRA Dropout:</strong> <code>0.05</code> (Aşırı uyumu / ezberlemeyi önleyici regülarizasyon)</li>
+    <li><strong>Hedef Modüller:</strong> Transformer dikkat katmanlarındaki <code>query</code> ve <code>value</code> projeksiyonları</li>
+    <li><strong>Öğrenme Oranı (Learning Rate):</strong> <code>5e-5</code> (Ağırlıkların sarsılmadan kararlı öğrenmesi için düşük adım boyutu)</li>
+    <li><strong>Epoch Sayısı:</strong> <code>4</code> Epoch</li>
+  </ul>
+
+  <h2>5. Eğitim Dinamikleri ve Kayıp (Loss) Analizi</h2>
+  <p>
+    Modelin öğrenme sürecini adım ve epoch bazında takip ettiğimizde:
+  </p>
+  <ul>
+    <li><strong>Başlangıç:</strong> Eğitim kaybı (loss) ilk adımlarda <code>30+</code> seviyelerindeyken, modelin grafik şablonuna hızla uyum sağlamasıyla ilk 200 adımda <code>~5.0</code> bandına geriledi.</li>
+    <li><strong>Epoch Bazlı Gelişim:</strong> Epoch 1: <code>5.90</code> &rarr; Epoch 2: <code>4.49</code> &rarr; Epoch 3: <code>4.42</code> &rarr; Epoch 4: <code>4.40</code>.</li>
+    <li><strong>Sonuç:</strong> Kaybın 2. epoch'tan itibaren 4.4 bandında plato çizmesi, modelin aşırı ezberleme (overfitting) yapmadan verimli ve dengeli bir şekilde genelleme kabiliyeti kazandığını kanıtladı.</li>
+  </ul>
+
+  <h2>6. Elde Ettiğimiz Değerlendirme Sonuçları</h2>
+  <p>
+    Eğitilen modelleri 300 test grafiği üzerinde temel (ham) modellerle kıyasladığımızda şu somut sonuçlara ulaştık:
+  </p>
+
+  <h3>1. Sayısal Hata Düşüşü (MAE ve RMSE)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Model Konfigürasyonu</th>
+        <th>MAE (Ortalama Mutlak Hata) &darr;</th>
+        <th>RMSE (Kök Ortalama Kare Hata) &darr;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>DePlot (Ham / Baseline)</strong></td>
+        <td>664.53</td>
+        <td>30,868.62</td>
+      </tr>
+      <tr>
+        <td><strong>DePlot (LoRA İnce Ayarlı)</strong></td>
+        <td><strong>459.25</strong> <span class="badge">-%30.9 Düşüş</span></td>
+        <td><strong>13,924.31</strong> <span class="badge">-%54.9 Düşüş</span></td>
+      </tr>
+      <tr>
+        <td><strong>Qwen2-VL-2B (LoRA İnce Ayarlı)</strong></td>
+        <td>482.64</td>
+        <td><strong>5,258.28</strong> <span class="badge" style="background:#dcfce7;color:#15803d;">Outlier Lideri</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul>
+    <li><strong>MAE (Ortalama Mutlak Hata):</strong> DePlot LoRA, 664'ten <strong>459'a</strong> inerek ortalama sayısal değer çıkarmada %31 iyileşme gösterdi.</li>
+    <li><strong>RMSE ve Aykırı Değerler:</strong> DePlot ham haliyle bazı grafiklerde büyük sapmalar yaparken, LoRA ince ayarı bunu yarıdan fazla düşürdü. Ancak asıl sürprizi <strong>Qwen2-VL</strong> yaptı; <strong>5,258 RMSE</strong> ile aykırı değerleri filtrelemede sınıf lideri olduğunu ve saçmalamadığını gösterdi.</li>
+    <li><strong>MedAE = 0.0:</strong> Her iki ince ayarlı modelde de medyan mutlak hata sıfır çıktı. Yani tipik grafiklerin büyük çoğunluğunda sayılar tam isabetle yakalandı.</li>
+  </ul>
+
+  <h3>2. Tablo Formatını ve Hücreleri Koruma Oranı</h3>
+  <p>
+    Bir grafik modelinin sadece sayıları doğru bilmesi yetmez; kaç satır ve kaç sütun olduğunu da doğru kurması gerekir:
+  </p>
+  <ul>
+    <li><strong>Ham DePlot:</strong> %56.7 Hücre Eşleşmesi (4,440 / 7,826 hücre)</li>
+    <li><strong>İnce Ayarlı DePlot LoRA:</strong> <strong>%69.0 Hücre Eşleşmesi</strong> (5,401 / 7,826 hücre)</li>
+    <li>İnce ayar sayesinde model, doğru formatta <strong>yaklaşık 1,000 ek hücreyi</strong> daha eksiksiz üretmeyi başardı.</li>
+  </ul>
+
+  <h2>7. Donanım Optimizasyonu: 4-bit (NF4) Nicelleştirme</h2>
+  <p>
+    2.2 Milyar parametreli Qwen2-VL modelini 4 GB VRAM'e sahip mütevazı bir GPU'da (RTX 3050 Laptop) çalıştırabilmek için modeli <strong>BitsAndBytes 4-bit (NF4)</strong> formatında yükledik. 
+  </p>
+  <p>
+    Bu optimizasyon sayesinde modelin VRAM tüketimi <strong>1.46 GB</strong> seviyesine indi ve yerel bir bilgisayarda donanım sınırlarına takılmadan akıcı bir şekilde çıkarım yapabilir hale geldi.
+  </p>
+
+  <h2>8. Özet</h2>
+  <p>
+    Bu çalışmada:
+  </p>
+  <ol style="margin-top: 4pt; padding-left: 18pt;">
+    <li>Görsel grafikleri tabloya çevirme görevine odaklandık.</li>
+    <li>Google DePlot ve Qwen2-VL modellerine PEFT/LoRA yöntemiyle parametrelerinin %1'inden azını güncelleyerek ince ayar uyguladık.</li>
+    <li>LoRA ince ayarı ile sayısal hatada (MAE/RMSE) %30 ila %55 arasında belirgin bir iyileşme sağladık ve yapısal hücre koruma oranını %56.7'den %69.0'a çıkardık.</li>
+    <li>Modelleri 4-bit nicelleştirerek standart tüketici donanımlarında yerel olarak çalıştırılabilir hale getirdik.</li>
+  </ol>
+
+  <div class="footer-note">
+    ChartToText • Görsel Grafik Verisi Çıkarım ve İnce Ayar Değerlendirme Raporu
+  </div>
+
+</body>
+</html>
